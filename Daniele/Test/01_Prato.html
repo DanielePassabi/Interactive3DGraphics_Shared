@@ -22,7 +22,7 @@
 
 	<script>
 
-        var prato, home_1;
+        var mondo;
         var rotation = false;
 
 		function Start() {
@@ -48,27 +48,62 @@
 			document.body.appendChild(renderer.domElement);
 
             ////////////
-            // PRATO //
+            // MONDO //
             //////////
 
-            var geometry_prato = new THREE.CubeGeometry(4,4,0.00000001);
-            var geometry_home = new THREE.CubeGeometry(1,1,1);
-
+            // PRATO
+            var geometry_prato = new THREE.CubeGeometry(400,0.05,400);
             var material_green = new THREE.MeshBasicMaterial( { color: 'green' } );
+            var prato = new THREE.Mesh( geometry_prato, material_green );
+
+            // traslo ad altezza 0
+            prato.position.set(0,-0.5,0); 
+
+            // CASA
+
+            // base
+            var geometry_casa = new THREE.CubeGeometry(2,1,1.5);
             var material_yellow = new THREE.MeshBasicMaterial( { color: '#f2f073' } );
+            var base = new THREE.Mesh( geometry_casa, material_yellow );
 
-            // Creo il prato e lo ruoto
-            prato = new THREE.Mesh( geometry_prato, material_green );
-            prato.rotation.x = 5
+            // tetto
+            var geometry_tetto = new THREE.ConeGeometry(1.5, 0.8, 4);
+            var material_red = new THREE.MeshBasicMaterial( { color: '#792020' } );
+            
+            /* facce di colore diverso --> non va
+            material_for_faces = new THREE.MeshBasicMaterial({
+				side: THREE.FrontSide,
+				vertexColors: THREE.FaceColors // voglio usare FaceColors
+            });
 
-            // Creo la casa
-            home_1 = new THREE.Mesh( geometry_home, material_yellow );
+            // Specifico i colori delle facce --> NON VA CAZZ
+			//tetto.faces[ 0].color = tetto.faces[ 1].color = new THREE.Color('red');
+            //tetto.faces[ 2].color = tetto.faces[ 3].color = new THREE.Color('yellow');
+            
+            var tetto = new THREE.Mesh( geometry_tetto, material_for_faces );
 
+            */
+            
+            var tetto = new THREE.Mesh( geometry_tetto, material_red );
+            tetto.position.set(0,0.9,0); 
+            tetto.rotation.y = 4;
+
+            // porta
+            var geometry_porta = new THREE.CubeGeometry(0.4,0.5,1.55);
+            var material_brown = new THREE.MeshBasicMaterial( { color: '#7a621f' } );
+            var porta = new THREE.Mesh( geometry_porta, material_brown );
+            porta.position.set(0,-0.25,0); 
+
+            // Creo il gruppo casa
+            casa = new THREE.Group();
+            casa.add(base);
+            casa.add(tetto);
+            casa.add(porta);
 
             // Creo il gruppo 'mondo' e aggiungo i vari componenti
-            var mondo = new THREE.Group();
+            mondo = new THREE.Group();
             mondo.add( prato );
-            mondo.add( home_1 );
+            mondo.add( casa );
 
             scene.add( mondo );
 
@@ -107,8 +142,10 @@
 			};
 
             if (rotation) {
-                mondo.rotation.z += 0.001;
+                mondo.rotation.y += 0.005;
             }
+
+            // mondo.rotation.y += 0.005;
 
 			stats.update();
 			renderer.render(scene, camera);
