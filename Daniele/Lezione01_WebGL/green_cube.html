@@ -1,0 +1,65 @@
+<html>
+    <head>
+        <title>My first Three.js app</title>
+        <style>canvas { width: 100%; height: 100% }</style>
+    </head>
+    <body>
+        <script src="../lib/three.min.js"></script>
+        <script src="../lib/stats.min.js"></script>
+        <script>
+
+            // NB: Da qui fino a Update() le cose dovrebbero stare in function Start() --> MA NON FUNZIONA!
+
+            var scene = new THREE.Scene();                 // settiamo la scena
+
+            var camera = new THREE.PerspectiveCamera(      // settiamo la camera
+                75, 
+                window.innerWidth / window.innerHeight, 
+                0.1, 
+                1000 
+                );
+
+            var renderer = new THREE.WebGLRenderer();      // settiamo il renderer
+
+            renderer.setSize( window.innerWidth, window.innerHeight );
+            document.body.appendChild( renderer.domElement );
+
+            var geometry = new THREE.CubeGeometry(1,1,1);
+            var material = new THREE.MeshBasicMaterial( { color: "#4EC5F1" } );
+            var cube = new THREE.Mesh( geometry, material );
+
+            scene.add( cube ); // aggiungo l'oggetto appena creato alla scena
+
+            camera.position.z = 5
+
+            // Codice per monitorare gli FPS
+            stats = new Stats();
+            stats.domElement.style.position = 'absolute';
+            stats.domElement.style.top = '1vw';
+            stats.domElement.style.left = '1vw';
+            document.body.appendChild( stats.domElement );
+
+
+            function Update() {
+
+                // Codice per monitorare gli FPS 
+                requestAnimationFrame(Update);
+
+                // Faccio ruotare il cubo
+                cube.rotation.x += 0.01;
+                cube.rotation.y += 0.01;
+    
+                // Codice per FPS
+                stats.update();
+
+                // Renderizzo scena e camera
+                renderer.render(scene, camera); 
+                
+            }
+                
+            //Start();        // inizializzazione: cose fatte una volta sola
+            Update();       // operazioni che vengono fatte molte volte al secondo
+            
+        </script>
+    </body>
+</html>
