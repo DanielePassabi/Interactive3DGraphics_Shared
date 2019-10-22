@@ -1,0 +1,123 @@
+<html>
+
+<head>
+	<title>Il mio prato infinito</title>
+	<style>
+		body {
+			font-family: Monospace;
+			margin: 0px;
+			overflow: hidden;
+		}
+		canvas {
+			width: 100%;
+			height: 100%;
+		}
+	</style>
+	<script src="../lib/three.min.js"></script>
+    <script src="../lib/stats.min.js"></script>
+
+</head>
+
+<body>
+
+	<script>
+
+        var prato, home_1;
+        var rotation = false;
+
+		function Start() {
+			
+            //////////////////////////
+            // OPERAZIONI INIZIALI //
+            ////////////////////////
+
+            // Creo una scena, una camera ed un renderer
+            scene = new THREE.Scene();
+
+            // Scelgo il colore del background
+            scene.background = new THREE.Color( '#b1e0e2' );
+
+            // Creo la camera
+			camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+
+            // Il renderer che useremo sarà sempre WebGL, in questo caso è impostato alla dimensione della finestra
+			renderer = new THREE.WebGLRenderer();
+			renderer.setSize(window.innerWidth, window.innerHeight);
+
+            // ?
+			document.body.appendChild(renderer.domElement);
+
+            ////////////
+            // PRATO //
+            //////////
+
+            var geometry_prato = new THREE.CubeGeometry(4,4,0.00000001);
+            var geometry_home = new THREE.CubeGeometry(1,1,1);
+
+            var material_green = new THREE.MeshBasicMaterial( { color: 'green' } );
+            var material_yellow = new THREE.MeshBasicMaterial( { color: '#f2f073' } );
+
+            // Creo il prato e lo ruoto
+            prato = new THREE.Mesh( geometry_prato, material_green );
+            prato.rotation.x = 5
+
+            // Creo la casa
+            home_1 = new THREE.Mesh( geometry_home, material_yellow );
+
+
+            // Creo il gruppo 'mondo' e aggiungo i vari componenti
+            var mondo = new THREE.Group();
+            mondo.add( prato );
+            mondo.add( home_1 );
+
+            scene.add( mondo );
+
+            ///////////////////////////
+            // POSIZIONE TELECAMERA //
+            /////////////////////////
+
+            camera.position.z = 5
+
+            ////////////////////////////////
+            // GESTIONE MONITORAGGIO FPS //
+            //////////////////////////////
+			stats = new Stats();
+			stats.domElement.style.position = 'absolute';
+			stats.domElement.style.top = '1vw';
+            stats.domElement.style.left = '1vw';
+
+            // ?
+			document.body.appendChild(stats.domElement);
+
+            // Posiziono la camera lungo l'asse z, in posizione 5
+			camera.position.z = 5;
+		}
+
+		function Update() {
+            requestAnimationFrame(Update);
+            
+            // Premi 's' per far ruotare il mondo
+
+            document.addEventListener("keydown", onDocumentKeyDown, false);
+			function onDocumentKeyDown(event) {
+				var keyCode = event.which;
+				if (keyCode == 83) {       // s
+					rotation = !rotation;
+				}
+			};
+
+            if (rotation) {
+                mondo.rotation.z += 0.001;
+            }
+
+			stats.update();
+			renderer.render(scene, camera);
+		}
+		
+        Start();
+		Update();
+
+	</script>
+</body>
+
+</html>
