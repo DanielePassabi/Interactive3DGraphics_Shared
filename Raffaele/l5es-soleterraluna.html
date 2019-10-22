@@ -1,0 +1,99 @@
+<html>
+	<head>
+		<title>Working with Matrices</title>
+		<style>
+
+		body {
+			font-family: Monospace;
+			background-color: #f0f0f0;
+			margin: 0px;
+			overflow: hidden;
+		}
+
+		canvas {
+			width: 100%;
+			height: 100%;
+		}
+
+	</style>
+		<script src="libs/three.js"></script>
+		<script src="libs/stats.min.js"></script>
+		<script src="libs/Coordinates.js"></script>
+		<script src="libs/OrbitControls.js"></script>
+	</head>
+	<body>
+
+		<script>
+
+		var scene, camera, renderer, controls, stats, earth, sun, moon, clock, earthPivot;
+
+		function Start() {
+			scene = new THREE.Scene();
+			camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
+			clock = Date.now();
+			renderer = new THREE.WebGLRenderer();
+			renderer.setSize( window.innerWidth, window.innerHeight );
+			renderer.setClearColor( 0xf0f0f0 );
+			document.body.appendChild( renderer.domElement );
+
+			camera.position.set(0,0,14);
+			camera.lookAt( new THREE.Vector3(0,0,0));
+
+			var geometry = new THREE.SphereGeometry(4,20,20);
+			var material = new THREE.MeshBasicMaterial( { color: 0xfff000, wireframe: true} );
+			sun = new THREE.Mesh( geometry, material );
+
+			scene.add( sun );
+
+			var geometry = new THREE.SphereGeometry(1,20,20);
+			var material = new THREE.MeshBasicMaterial( { color: 0x006060, wireframe: true} );
+			earth = new THREE.Mesh( geometry, material );
+			earthPivot = new THREE.Object3D();
+
+			earthPivot.add( earth );
+
+			earth.rotation.z = 25 * Math.PI/180;
+
+			scene.add(earthPivot);
+
+			
+
+			earth.position.set(0,0,10);
+			
+			controls = new THREE.OrbitControls( camera );
+
+			stats = new Stats();
+			stats.domElement.style.position = 'absolute';
+			stats.domElement.style.top = '0px';
+			document.body.appendChild( stats.domElement );
+
+
+			
+
+
+
+		}
+
+		function Update() {
+		
+
+			//earthPivot.rotation.y += 0.02;
+			earth.rotation.y += 0.02;
+			clock = Date.now() + 1000;
+			requestAnimationFrame(Update);
+			controls.update();
+			stats.update();
+			Render();
+		}
+
+		function Render() {
+
+			renderer.render(scene, camera);
+		}
+
+		Start();
+		Update();
+
+		</script>
+	</body>
+</html>

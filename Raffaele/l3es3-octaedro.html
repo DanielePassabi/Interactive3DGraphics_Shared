@@ -1,0 +1,118 @@
+<html>
+	<head>
+		<title>es2 octaedro
+        </title>
+		<style>
+		body {
+			font-family: Monospace;
+			background-color: #f0f0f0;
+			margin: 0px;
+			overflow: hidden;
+		}
+		canvas {
+			width: 100%;
+			height: 100%;
+		}
+		</style>
+		<script src="lib/three.js"></script>
+		<script src="lib/stats.min.js"></script>
+	</head>
+	<body>
+
+		<script>
+			var scene, renderer, camera, stats, octaedro;
+			
+			function Start() {
+			
+				scene = new THREE.Scene();
+				camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
+				renderer = new THREE.WebGLRenderer();
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setClearColor(0xf0f0f0);//pulire lo sfondo con un colore scelto
+				document.body.appendChild( renderer.domElement );
+				
+				var geometry = new THREE.OctahedronGeometry(1,0);
+				var material = new THREE.MeshBasicMaterial( { color: 0x000000, wireframe: true } );
+				Redifine(geometry, 2);
+				octaedro = new THREE.Mesh( geometry, material );
+				scene.add( octaedro );
+				camera.position.z = 5;
+                camera.position.y = -1;
+				stats = new Stats();
+				stats.domElement.style.position = 'absolute';
+				stats.domElement.style.top = '0px';
+				document.body.appendChild( stats.domElement );
+				
+			}
+
+			function Redifine(octahedron, number){
+				if(number != 0){
+					var inizio = octahedron.vertices.length;
+					var nfaces = octahedron.faces.length;
+					var vertici = octahedron.vertices;
+					var min = FindMin(vertici);
+					for(i=0; i<inizio; i++){
+						for(j=i+1; j<inizio; j++){
+							if(Distance(vertici[i],vertici[j])==min){
+								octahedron.vertices.push( new THREE.Vector3(Medium(vertici[i].x, vertici[j].x),
+								Medium(vertici[i].y, vertici[j].y),
+								Medium(vertici[i].z, vertici[j].z)));
+							}
+						}
+					}
+					var vertici2 = octahedron.vertices;
+					var fine = vertici2.length;
+					var min2 = FindMin(vertici2);
+					a = 0;
+					for(i=0; i < fine; i++){
+						for(j=i+1; j < fine; j++){
+							for(k=j+1; k < fine; k++){
+								if(Distance(vertici2[i],vertici2[j])==min2 &&
+								Distance(vertici2[i],vertici2[k])==min2 &&
+								Distance(vertici2[k],vertici2[j])==min2){
+									if(a<nfaces){
+										octahedron.faces[a] = new THREE.Face3(i,j,k);
+										a = a + 1;
+									}else{
+										octahedron.faces.push(new THREE.Face3(i,j,k));
+									}								
+								}
+							}
+						}	
+					}
+					//octahedron.geometry.normalsNeedUpdate = true;
+					//octahedron.geometry.verticesNeedUpdate = true;
+					Redifine(octahedron, number - 1);
+				}
+			}
+			function Medium( a, b ){
+				return (a + b) / 2;
+			}
+			function Distance(a, b){
+				return Math.sqrt((a.x - b.x)*(a.x - b.x)+(a.y - b.y)*(a.y - b.y)+(a.z - b.z)*(a.z - b.z));
+			}
+			function FindMin(a){
+				var min = Distance(a[0],a[1]);
+				for(i=0; i<a.length; i++){
+					for(j=i+1; j<a.length; j++){
+						if(Distance(a[i],a[j])<min){
+							min = Distance(a[i],a[j]);
+						}
+					}
+				}
+				return min;
+			}
+			
+			function Update() {
+				octaedro.rotation.y += 0.02;
+				requestAnimationFrame(Update);
+				stats.update();
+				renderer.render(scene, camera);
+			}
+			
+			Start();
+			Update();
+			
+		</script>
+	</body>
+</html>

@@ -1,0 +1,66 @@
+<html>
+    <head>
+        <title> primi esempi di trasformazioni</title>
+            <style>        
+                body {
+			       font-family: Monospace;
+			        background-color: #f0f0f0;
+			        margin: 0px;
+			        overflow: hidden;
+		        }            
+                canvas {
+                     width: 100%;
+                     height: 100%;
+                  }
+                </style>
+                <script src="lib/three.js"></script>
+                <script src="lib/stats.min.js"></script>
+    </head>
+    <body>
+
+        <script>
+            var scene, renderer, camera, stats, cube;
+            function Start() {
+
+                scene = new THREE.Scene();
+				camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
+                // window.innerwidth  e window.innerHeight ci permettno di usare le grandezze della finestra
+                renderer = new THREE.WebGLRenderer();
+				renderer.setSize( window.innerWidth, window.innerHeight );
+                renderer.setClearColor(0xf0f0f0);//pulire lo sfondo con un colore scelto
+                document.body.appendChild( renderer.domElement );
+                var geometry = new THREE.CubeGeometry(1,1,1);
+                var material = new THREE.MeshBasicMaterial( { color: 0x00ff000, wireframe: true } ); // specificare un colore javascript non è veramente object oriented 
+                //per costruire un oggetto mettiamo 2 graffe con all' interno la proprietà ad esempio {green size ...} quindi le graffe indicano un oggetto inquesto caso color
+                cube = new THREE.Mesh( geometry, material );
+                cube.position.set( 1, 0 , 0); // lo sposto di 1 cosa? l'unità in realtànon è specificata se non specificata è 1 cm
+                //se si importano modelli dovranno essere scalati opportunamente
+                //position è un vector3 (verificabile dalla console inserendo cube
+                //ma allora perchè non assegnargli il valore direttamente?
+                //in realtà non si può perchè è un attributo immutable non è possibile sostituirlo con un altro riferimento a un altro oggetto in memoria
+                //è possibile solo modificare l'oggetto a cui punta già position con un setter
+                cube.rotation.z = 45 * Math.PI/180; // l'angolo deve essere espresso in radianti questo è un modo comodo per esprimerlo
+                //in gradi
+                cube.scale.set(3, 3 , 3);
+                scene.add( cube );
+                camera.position.z = 5; 
+            
+                stats = new Stats(); // ci servirà per capire i frame dandoci la statistica
+                stats.domElement.style.position = 'absolute';
+                stats.domElement.style.top = '0px';
+                document.body.appendChild( stats.domElement );
+            }
+            //ci manca il project loop scriviamo una funzione che :
+            function Update() {
+                    requestAnimationFrame(Update); //1)è una funzione del browser che richiede il frame al render alla frequezna con cui il browser riesce 
+                    //"ovvero la prossima volta che puoi (browser) stampare richeidi un frame" in modo da addattarsi a diversi dispositivi
+                    stats.update();
+                    renderer.render(scene, camera); //2)gli chiediamo di fare il render della scena dal punto di vista della camara
+            }
+
+            Start();
+            Update();
+        </script>
+                                       
+     </body>
+ </html>

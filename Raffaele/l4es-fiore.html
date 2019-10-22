@@ -1,0 +1,94 @@
+<html>
+	<head>
+		<title>Combining Transformations</title>
+		<style>
+
+		body {
+			font-family: Monospace;
+			background-color: #f0f0f0;
+			margin: 0px;
+			overflow: hidden;
+		}
+
+		canvas {
+			width: 100%;
+			height: 100%;
+		}
+
+	</style>
+		<script src="libs/three.js"></script>
+		<script src="libs/stats.min.js"></script>
+	</head>
+	<body>
+
+		<script>
+
+			var scene, camera, renderer, sphere, cylinder;
+
+			function Start() {
+
+
+			scene = new THREE.Scene();
+			camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
+			renderer = new THREE.WebGLRenderer();
+			renderer.setSize( window.innerWidth, window.innerHeight );
+			renderer.setClearColor( 0xf0f0f0 );
+			document.body.appendChild( renderer.domElement );
+
+			// sphere
+			var sphere_geometry = new THREE.SphereGeometry(1,32,32); // le altre due sono queanto la sfera è tassellata / perfezionata
+			var sphere_material = new THREE.MeshBasicMaterial( { color: 0xffff00 } );
+			sphere = new THREE.Mesh( sphere_geometry, sphere_material );
+			sphere.position.set(0,2,0);
+			scene.add( sphere );
+
+			// cylinder
+			var cylinder_geometry = new THREE.CylinderGeometry(0.3, 0.3, 3); // raggio altezza
+			var cylinder_material = new THREE.MeshBasicMaterial( { color: 0x008000 } );
+			cylinder = new THREE.Mesh( cylinder_geometry, cylinder_material );
+			scene.add(cylinder);
+            //petalo
+            var petal_geometry = new THREE.CylinderGeometry(0.3, 0, 6); // raggio altezza
+			var petal_material = new THREE.MeshBasicMaterial( { color: 0xffffff } );
+            
+			for(i = 0 ; i < 36; i++){
+				var petal = new THREE.Mesh( petal_geometry, petal_material ) ;
+				petal.rotation.z = 90 * Math.PI/180;
+				petal.rotation.y = 10 * i * Math.PI/180;
+				petal.position.set(0,2,0);
+				scene.add(petal);
+			}
+			
+            //se facciamo più trsformazioni prima viene applicata la scalatura poi la rotazione poi la traslazione scrivendolo
+            //nei termini delle slide t r s (lette in questo verso <-)
+            //se invece volessi farele in un altro ordine?
+            //aggiungiamo un oggetto pivot di topo object3D che è anche la superclasse di mesh
+            //il pivot non disegna nulla ma ci serve comepunto intermedio su cui fare prima i le operazioni che vogliamo mettere
+            //in un certo senso usiamo come la struttura ad albero di threejs usando un finto oggetto che ci permetta di fare le operazioni
+            // nell'ordine che vogliamo agendo su esso ( le trsformazioni si applicano dallefoglie alla radice)
+            // in realtà questo si utilizza propriamente per far ruotare oggetti dipendenti da altri
+            //ruotando un braccio anche la mano subisce la stessa rotazione
+			stats = new Stats();
+			stats.domElement.style.position = 'absolute';
+			stats.domElement.style.top = '0px';
+			document.body.appendChild( stats.domElement );
+
+			camera.position.z = 5;
+            camera.position.y = 3;
+
+		}
+
+			function Update() {
+
+				requestAnimationFrame(Update);
+
+				stats.update();
+
+				renderer.render(scene, camera);
+			}
+
+			Start();
+			Update();
+		</script>
+	</body>
+</html>

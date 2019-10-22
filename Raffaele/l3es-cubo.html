@@ -1,0 +1,148 @@
+<html>
+	<head>
+		<title>Cubo multicolore</title>
+		<style>
+		body {
+			font-family: Monospace;
+			background-color: #f0f0f0;
+			margin: 0px;
+			overflow: hidden;
+		}
+		canvas {
+			width: 100%;
+			height: 100%;
+		}
+	    </style>
+		<script src="lib/three.js"></script>
+		<script src="lib/stats.min.js"></script>
+	</head>
+	<body>
+
+		<script>
+			var scene, renderer, camera, stats, meshxy, meshxz, meshyz, meshyzp, meshxzp, meshxyp;
+			
+			function Start() {
+			
+				scene = new THREE.Scene();
+				camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
+				renderer = new THREE.WebGLRenderer();
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setClearColor(0xf0f0f0);//pulire lo sfondo con un colore scelto
+				document.body.appendChild( renderer.domElement );
+				
+				var facexy = new THREE.Geometry(); //questa volta dobbiamo disegnare un triangolo
+                facexy.vertices.push(new THREE.Vector3(0, 0, 0), // push prenderà un numero di argomenti a piacere
+				new THREE.Vector3(2, 0, 0),
+				new THREE.Vector3(0, 2, 0),//Vector3 indica un vettore a 3 dimensioni
+				new THREE.Vector3(2, 2, 0),
+				); //ho messo i vettori per push
+                facexy.faces.push(new THREE.Face3(2, 1, 0)); // 0 1 2 indicano i puntatori al vettore push e quindi i 3 vector3
+				facexy.faces.push(new THREE.Face3(1, 2, 3));
+                var material = new THREE.MeshBasicMaterial({
+                    color: 0x12ff56,
+                    side: THREE.FrontSide
+                });
+                meshxy = new THREE.Mesh(facexy, material);
+                var facexz = new THREE.Geometry(); 
+                facexz.vertices.push(new THREE.Vector3(0, 0, 0), 
+				new THREE.Vector3(2, 0, 0),
+				new THREE.Vector3(0, 0, 2),
+				new THREE.Vector3(2, 0, 2),
+				);
+                facexz.faces.push(new THREE.Face3(1, 2, 0)); // 0 1 2 indicano i puntatori al vettore push e quindi i 3 vector3
+				facexz.faces.push(new THREE.Face3(1, 3, 2));
+                var material = new THREE.MeshBasicMaterial({
+                    color: 0xff3456,
+                    side: THREE.FrontSide
+                });
+                meshxz = new THREE.Mesh(facexz, material);
+                var faceyz = new THREE.Geometry(); 
+                faceyz.vertices.push(new THREE.Vector3(0, 0, 0), 
+				new THREE.Vector3(0, 2, 0),
+				new THREE.Vector3(0, 0, 2),
+				new THREE.Vector3(0, 2, 2),
+				);
+                faceyz.faces.push(new THREE.Face3(2, 3, 0)); // 0 1 2 indicano i puntatori al vettore push e quindi i 3 vector3
+				faceyz.faces.push(new THREE.Face3(3, 1, 0));
+                var material = new THREE.MeshBasicMaterial({
+                    color: 0x1234ff,
+                    side: THREE.FrontSide
+                });
+                meshyz = new THREE.Mesh(faceyz, material);
+                var facexyp = new THREE.Geometry(); //questa volta dobbiamo disegnare un triangolo
+                facexyp.vertices.push(new THREE.Vector3(0, 0, 2), // push prenderà un numero di argomenti a piacere
+				new THREE.Vector3(2, 0, 2),
+				new THREE.Vector3(0, 2, 2),//Vector3 indica un vettore a 3 dimensioni
+				new THREE.Vector3(2, 2, 2),
+				); //ho messo i vettori per push
+                facexyp.faces.push(new THREE.Face3(0, 1, 2)); // 0 1 2 indicano i puntatori al vettore push e quindi i 3 vector3
+				facexyp.faces.push(new THREE.Face3(3, 2, 1));
+                var material = new THREE.MeshBasicMaterial({
+                    color: 0x12ffff,
+                    side: THREE.FrontSide
+                });
+                meshxyp = new THREE.Mesh(facexyp, material);
+                var facexzp = new THREE.Geometry(); 
+                facexzp.vertices.push(new THREE.Vector3(0, 2, 0), 
+				new THREE.Vector3(2, 2, 0),
+				new THREE.Vector3(0, 2, 2),
+				new THREE.Vector3(2, 2, 2),
+				);
+                facexzp.faces.push(new THREE.Face3(0, 2, 3)); // 0 1 2 indicano i puntatori al vettore push e quindi i 3 vector3
+				facexzp.faces.push(new THREE.Face3(0, 3, 1));
+                var material = new THREE.MeshBasicMaterial({
+                    color: 0xffff56,
+                    side: THREE.FrontSide
+                });
+                meshxzp = new THREE.Mesh(facexzp, material);
+                var faceyzp = new THREE.Geometry();
+                faceyzp.vertices.push(new THREE.Vector3(2, 0, 0), 
+				new THREE.Vector3(2, 2, 0),
+				new THREE.Vector3(2, 0, 2),
+				new THREE.Vector3(2, 2, 2),
+				);
+                faceyzp.faces.push(new THREE.Face3(0, 3, 2)); // 0 1 2 indicano i puntatori al vettore push e quindi i 3 vector3
+				faceyzp.faces.push(new THREE.Face3(0, 1, 3));
+                var material = new THREE.MeshBasicMaterial({
+                    color: 0xff34ff,
+                    side: THREE.FrontSide
+                });
+                meshyzp = new THREE.Mesh(faceyzp, material);
+                scene.add( meshyzp );
+                scene.add( meshxyp );
+                scene.add( meshxzp );
+                scene.add( meshyz );
+                scene.add( meshxy );
+                scene.add( meshxz );
+				camera.position.z = 5;
+				stats = new Stats();
+				stats.domElement.style.position = 'absolute';
+				stats.domElement.style.top = '0px';
+				document.body.appendChild( stats.domElement );
+				
+			}
+			
+			function Update() {
+                meshxy.rotation.y += 0.03;
+                meshxz.rotation.y += 0.03;
+                meshyz.rotation.y += 0.03;
+                meshxyp.rotation.y += 0.03;
+                meshxzp.rotation.y += 0.03;
+                meshyzp.rotation.y += 0.03;
+                meshxy.rotation.x += 0.03;
+                meshxz.rotation.x += 0.03;
+                meshyz.rotation.x += 0.03;
+                meshxyp.rotation.x += 0.03;
+                meshxzp.rotation.x += 0.03;
+                meshyzp.rotation.x += 0.03;
+				requestAnimationFrame(Update);
+				stats.update();
+				renderer.render(scene, camera);
+			}
+
+			Start();
+			Update();
+			
+		</script>
+	</body>
+</html>
