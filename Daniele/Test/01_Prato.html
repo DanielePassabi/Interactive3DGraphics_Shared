@@ -1,0 +1,160 @@
+<html>
+
+<head>
+	<title>Il mio prato infinito</title>
+	<style>
+		body {
+			font-family: Monospace;
+			margin: 0px;
+			overflow: hidden;
+		}
+		canvas {
+			width: 100%;
+			height: 100%;
+		}
+	</style>
+	<script src="../lib/three.min.js"></script>
+    <script src="../lib/stats.min.js"></script>
+
+</head>
+
+<body>
+
+	<script>
+
+        var mondo;
+        var rotation = false;
+
+		function Start() {
+			
+            //////////////////////////
+            // OPERAZIONI INIZIALI //
+            ////////////////////////
+
+            // Creo una scena, una camera ed un renderer
+            scene = new THREE.Scene();
+
+            // Scelgo il colore del background
+            scene.background = new THREE.Color( '#b1e0e2' );
+
+            // Creo la camera
+			camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+
+            // Il renderer che useremo sarà sempre WebGL, in questo caso è impostato alla dimensione della finestra
+			renderer = new THREE.WebGLRenderer();
+			renderer.setSize(window.innerWidth, window.innerHeight);
+
+            // ?
+			document.body.appendChild(renderer.domElement);
+
+            ////////////
+            // MONDO //
+            //////////
+
+            // PRATO
+            var geometry_prato = new THREE.CubeGeometry(400,0.05,400);
+            var material_green = new THREE.MeshBasicMaterial( { color: 'green' } );
+            var prato = new THREE.Mesh( geometry_prato, material_green );
+
+            // traslo ad altezza 0
+            prato.position.set(0,-0.5,0); 
+
+            // CASA
+
+            // base
+            var geometry_casa = new THREE.CubeGeometry(2,1,1.5);
+            var material_yellow = new THREE.MeshBasicMaterial( { color: '#f2f073' } );
+            var base = new THREE.Mesh( geometry_casa, material_yellow );
+
+            // tetto
+            var geometry_tetto = new THREE.ConeGeometry(1.5, 0.8, 4);
+            var material_red = new THREE.MeshBasicMaterial( { color: '#792020' } );
+            
+            /* facce di colore diverso --> non va
+            material_for_faces = new THREE.MeshBasicMaterial({
+				side: THREE.FrontSide,
+				vertexColors: THREE.FaceColors // voglio usare FaceColors
+            });
+
+            // Specifico i colori delle facce --> NON VA CAZZ
+			//tetto.faces[ 0].color = tetto.faces[ 1].color = new THREE.Color('red');
+            //tetto.faces[ 2].color = tetto.faces[ 3].color = new THREE.Color('yellow');
+            
+            var tetto = new THREE.Mesh( geometry_tetto, material_for_faces );
+
+            */
+            
+            var tetto = new THREE.Mesh( geometry_tetto, material_red );
+            tetto.position.set(0,0.9,0); 
+            tetto.rotation.y = 4;
+
+            // porta
+            var geometry_porta = new THREE.CubeGeometry(0.4,0.5,1.55);
+            var material_brown = new THREE.MeshBasicMaterial( { color: '#7a621f' } );
+            var porta = new THREE.Mesh( geometry_porta, material_brown );
+            porta.position.set(0,-0.25,0); 
+
+            // Creo il gruppo casa
+            casa = new THREE.Group();
+            casa.add(base);
+            casa.add(tetto);
+            casa.add(porta);
+
+            // Creo il gruppo 'mondo' e aggiungo i vari componenti
+            mondo = new THREE.Group();
+            mondo.add( prato );
+            mondo.add( casa );
+
+            scene.add( mondo );
+
+            ///////////////////////////
+            // POSIZIONE TELECAMERA //
+            /////////////////////////
+
+            camera.position.z = 5
+
+            ////////////////////////////////
+            // GESTIONE MONITORAGGIO FPS //
+            //////////////////////////////
+			stats = new Stats();
+			stats.domElement.style.position = 'absolute';
+			stats.domElement.style.top = '1vw';
+            stats.domElement.style.left = '1vw';
+
+            // ?
+			document.body.appendChild(stats.domElement);
+
+            // Posiziono la camera lungo l'asse z, in posizione 5
+			camera.position.z = 5;
+		}
+
+		function Update() {
+            requestAnimationFrame(Update);
+            
+            // Premi 's' per far ruotare il mondo
+
+            document.addEventListener("keydown", onDocumentKeyDown, false);
+			function onDocumentKeyDown(event) {
+				var keyCode = event.which;
+				if (keyCode == 83) {       // s
+					rotation = !rotation;
+				}
+			};
+
+            if (rotation) {
+                mondo.rotation.y += 0.005;
+            }
+
+            // mondo.rotation.y += 0.005;
+
+			stats.update();
+			renderer.render(scene, camera);
+		}
+		
+        Start();
+		Update();
+
+	</script>
+</body>
+
+</html>
