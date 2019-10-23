@@ -31,7 +31,7 @@
 				renderer.setClearColor(0xf0f0f0);//pulire lo sfondo con un colore scelto
 				document.body.appendChild( renderer.domElement );
 				
-				var geometry = new THREE.OctahedronGeometry(1,0);
+				var geometry = new THREE.OctahedronGeometry(1,1);
 				var material = new THREE.MeshBasicMaterial( { color: 0x000000, wireframe: true } );
 				octaedro = new THREE.Mesh( geometry, material );
 				scene.add( octaedro );
@@ -46,7 +46,7 @@
 			}
 			
 			function Update() {
-				octaedro.rotation.y += 0.02;
+				//octaedro.rotation.y += 0.02;
 				requestAnimationFrame(Update);
 				stats.update();
 				renderer.render(scene, camera);
