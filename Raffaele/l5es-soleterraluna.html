@@ -25,7 +25,7 @@
 
 		<script>
 
-		var scene, camera, renderer, controls, stats, earth, sun, moon, clock, earthPivot;
+		var scene, camera, renderer, controls, stats, earth, sun, moon, clock, earthPivot, moonPivot;
 
 		function Start() {
 			scene = new THREE.Scene();
@@ -48,17 +48,26 @@
 			var geometry = new THREE.SphereGeometry(1,20,20);
 			var material = new THREE.MeshBasicMaterial( { color: 0x006060, wireframe: true} );
 			earth = new THREE.Mesh( geometry, material );
+			earth.position.set(0,0,10);
 			earthPivot = new THREE.Object3D();
 
 			earthPivot.add( earth );
 
-			earth.rotation.z = 25 * Math.PI/180;
+			earthPivot.rotation.z = 25 * Math.PI/180;
 
 			scene.add(earthPivot);
 
-			
+			var geometry = new THREE.SphereGeometry(0.5,20,20);
+			var material = new THREE.MeshBasicMaterial( { color: 0x0f0f0f, wireframe: true} );
+			moon = new THREE.Mesh( geometry, material );
+			moon.position.set(0,0,3);
+			moonPivot = new THREE.Object3D();
+			moonPivot.position.set(0,0,10);
+			earthPivot.add( moonPivot );
+			moonPivot.add(moon);
 
-			earth.position.set(0,0,10);
+
+			
 			
 			controls = new THREE.OrbitControls( camera );
 
@@ -75,9 +84,8 @@
 		}
 
 		function Update() {
-		
-
-			//earthPivot.rotation.y += 0.02;
+			earthPivot.rotation.y += 0.02;
+			moonPivot.rotation.y += 0.2;
 			earth.rotation.y += 0.02;
 			clock = Date.now() + 1000;
 			requestAnimationFrame(Update);
