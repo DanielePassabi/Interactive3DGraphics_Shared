@@ -5,5 +5,5 @@ Euler z = roll      [blu]
 Euler y = yaw       [verde]
 Euler x = pitch     [rosso]
 
-
+Possono portare al GIMBAL LOCK per particolari angoli (+90, -90) --> perdo dei gradi di libertà
 
