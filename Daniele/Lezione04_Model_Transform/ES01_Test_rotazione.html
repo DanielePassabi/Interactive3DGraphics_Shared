@@ -1,0 +1,96 @@
+<html>
+
+<head>
+	<title>Test rotazione</title>
+	<style>
+		body {
+			font-family: Monospace;
+			margin: 0px;
+			overflow: hidden;
+		}
+		canvas {
+			width: 100%;
+			height: 100%;
+		}
+	</style>
+	<script src="../lib/three.min.js"></script>
+    <script src="../lib/stats.min.js"></script>
+
+</head>
+
+<body>
+
+	<script>
+
+        var flower;
+        var rotation = false;
+        var petal_num = 4;
+
+		function Start() {
+			
+            //////////////////////////
+            // OPERAZIONI INIZIALI //
+            ////////////////////////
+
+            // Creo una scena, una camera ed un renderer
+            scene = new THREE.Scene();
+
+            // Scelgo il colore del background
+            scene.background = new THREE.Color( '#b1e0e2' );
+
+            // Creo la camera
+			camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+
+            // Il renderer che useremo sarà sempre WebGL, in questo caso è impostato alla dimensione della finestra
+			renderer = new THREE.WebGLRenderer();
+			renderer.setSize(window.innerWidth, window.innerHeight);
+
+            // ?
+			document.body.appendChild(renderer.domElement);
+
+            ////////////
+            // FIORE //
+            //////////
+
+            // CYLINDER
+            var cyl_material = new THREE.MeshBasicMaterial( { color: 0xff0000 } );
+            var cyl_width = 1;
+            var cyl_height = 5;
+            // THREE.CylinderGeometry(bottomRadius, topRadius, height, segmentsRadius, segmentsHeight, openEnded )
+            var cylGeometry = new THREE.CylinderGeometry(cyl_width, cyl_width, cyl_height, 20, 1, false);
+            // translate the cylinder geometry so that the desired point within the geometry is now at the origin
+            cylGeometry.applyMatrix( new THREE.Matrix4().makeTranslation( 0, cyl_height/2, 0 ) );
+            var cylinder = new THREE.Mesh(cylGeometry, cyl_material);
+
+            scene.add( cylinder );   
+
+            cylinder.rotation.z = 0.5*Math.PI;
+
+            ////////////////////////////////
+            // GESTIONE MONITORAGGIO FPS //
+            //////////////////////////////
+			stats = new Stats();
+			stats.domElement.style.position = 'absolute';
+			stats.domElement.style.top = '1vw';
+            stats.domElement.style.left = '1vw';
+
+            // ?
+			document.body.appendChild(stats.domElement);
+
+            // Posiziono la camera lungo l'asse z, in posizione 5
+			camera.position.z = 5;
+		}
+
+		function Update() {
+			requestAnimationFrame(Update);
+			stats.update();
+			renderer.render(scene, camera);
+		}
+		
+        Start();
+		Update();
+
+	</script>
+</body>
+
+</html>
