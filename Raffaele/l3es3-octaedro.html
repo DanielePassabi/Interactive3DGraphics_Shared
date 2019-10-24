@@ -33,11 +33,10 @@
 				
 				var geometry = new THREE.OctahedronGeometry(1,0);
 				var material = new THREE.MeshBasicMaterial( { color: 0x000000, wireframe: true } );
-				Redifine(geometry, 2);
+				Redifine(geometry, 7);
 				octaedro = new THREE.Mesh( geometry, material );
 				scene.add( octaedro );
 				camera.position.z = 5;
-                camera.position.y = -1;
 				stats = new Stats();
 				stats.domElement.style.position = 'absolute';
 				stats.domElement.style.top = '0px';
@@ -47,60 +46,76 @@
 
 			function Redifine(octahedron, number){
 				if(number != 0){
+                    var a, b, c, newvertex1, newvertex2, newvertex3;
 					var inizio = octahedron.vertices.length;
 					var nfaces = octahedron.faces.length;
 					var vertici = octahedron.vertices;
-					var min = FindMin(vertici);
-					for(i=0; i<inizio; i++){
-						for(j=i+1; j<inizio; j++){
-							if(Distance(vertici[i],vertici[j])==min){
-								octahedron.vertices.push( new THREE.Vector3(Medium(vertici[i].x, vertici[j].x),
-								Medium(vertici[i].y, vertici[j].y),
-								Medium(vertici[i].z, vertici[j].z)));
+					for(i=0; i<nfaces; i++){
+                        a = octahedron.faces[i].a;
+                        b = octahedron.faces[i].b;
+                        c = octahedron.faces[i].c;
+                        newvertex1 = (new THREE.Vector3(Medium(vertici[a].x, vertici[b].x),
+								Medium(vertici[a].y, vertici[b].y),
+								Medium(vertici[a].z, vertici[b].z)));
+                        newvertex2 = (new THREE.Vector3(Medium(vertici[c].x, vertici[b].x),
+								Medium(vertici[c].y, vertici[b].y),
+								Medium(vertici[c].z, vertici[b].z)));
+                        newvertex3 = (new THREE.Vector3(Medium(vertici[a].x, vertici[c].x),
+								Medium(vertici[a].y, vertici[c].y),
+								Medium(vertici[a].z, vertici[c].z)));
+                        b1 = true;
+                        b2 = true;
+                        b3 = true;
+						for(j=0; j<inizio; j++){
+							if(vertici[j].x == newvertex1.x &&
+                            vertici[j].y == newvertex1.y &&
+                            vertici[j].z == newvertex1.z){
+								b1=false;
+                                pos1 = j;
+							}
+                            if(vertici[j].x == newvertex2.x &&
+                            vertici[j].y == newvertex2.y &&
+                            vertici[j].z == newvertex2.z){
+								b2=false;
+                                pos2 = j;
+							}
+                            if(vertici[j].x == newvertex3.x &&
+                            vertici[j].y == newvertex3.y &&
+                            vertici[j].z == newvertex3.z){
+								b3=false;
+                                pos3 = j;
 							}
 						}
+                        if(b1){
+                            octahedron.vertices.push(newvertex1);
+                            pos1 = inizio;
+                            inizio++;
+                        }
+                        if(b2){
+                            octahedron.vertices.push(newvertex2);
+                            pos2 = inizio;
+                            inizio++;
+                        }
+                        if(b3){
+                            octahedron.vertices.push(newvertex3);
+                            pos3 = inizio;
+                            inizio++;
+                        }
+                        octahedron.faces[i] = new THREE.Face3(pos1,pos2,pos3);
+                        octahedron.faces.push(new THREE.Face3(a,pos1,pos3));
+                        octahedron.faces.push(new THREE.Face3(b,pos1,pos2));
+                        octahedron.faces.push(new THREE.Face3(c,pos2,pos3));
 					}
 					var vertici2 = octahedron.vertices;
 					var fine = vertici2.length;
-					var min2 = FindMin(vertici2);
-					a = 0;
 					for(i=0; i < fine; i++){
-						for(j=i+1; j < fine; j++){
-							for(k=j+1; k < fine; k++){
-								if(Distance(vertici2[i],vertici2[j])==min2 &&
-								Distance(vertici2[i],vertici2[k])==min2 &&
-								Distance(vertici2[k],vertici2[j])==min2){
-									if(a<nfaces){
-										octahedron.faces[a] = new THREE.Face3(i,j,k);
-										a = a + 1;
-									}else{
-										octahedron.faces.push(new THREE.Face3(i,j,k));
-									}								
-								}
-							}
-						}	
+						octahedron.vertices[i].normalize();
 					}
-					//octahedron.geometry.normalsNeedUpdate = true;
-					//octahedron.geometry.verticesNeedUpdate = true;
 					Redifine(octahedron, number - 1);
 				}
 			}
 			function Medium( a, b ){
 				return (a + b) / 2;
-			}
-			function Distance(a, b){
-				return Math.sqrt((a.x - b.x)*(a.x - b.x)+(a.y - b.y)*(a.y - b.y)+(a.z - b.z)*(a.z - b.z));
-			}
-			function FindMin(a){
-				var min = Distance(a[0],a[1]);
-				for(i=0; i<a.length; i++){
-					for(j=i+1; j<a.length; j++){
-						if(Distance(a[i],a[j])<min){
-							min = Distance(a[i],a[j]);
-						}
-					}
-				}
-				return min;
 			}
 			
 			function Update() {
