@@ -1,0 +1,120 @@
+<html>
+	<head>
+		<title>Working with Matrices</title>
+		<style>
+
+		body {
+			font-family: Monospace;
+			margin: 0px;
+			overflow: hidden;
+		}
+
+		canvas {
+			width: 100%;
+			height: 100%;
+		}
+
+	</style>
+		<script src="../lib/three.js"></script>
+		<script src="../lib/stats.min.js"></script>
+		<script src="../lib/Coordinates.js"></script>
+		<script src="../lib/OrbitControls.js"></script>
+	</head>
+	<body>
+
+		<script>
+
+		var scene, camera, renderer, controls, stats;
+
+		function Start() {
+
+			//////////////////////////
+            // OPERAZIONI INIZIALI //
+            ////////////////////////
+
+            // Creo una scena e ne setto il colore di background (sovrascrive il CSS)
+			scene = new THREE.Scene();
+			scene.background = new THREE.Color( '#b1e0e2' );
+
+			// Creo una camera
+			camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
+
+			// Creo un renderer
+			renderer = new THREE.WebGLRenderer();
+			renderer.setSize( window.innerWidth, window.innerHeight );
+			renderer.setClearColor( 0xf0f0f0 );
+			document.body.appendChild( renderer.domElement );
+
+			// Setto la posizione della camera e le dico dove guardare (origine)
+			camera.position.set(3,4,6);
+			camera.lookAt( new THREE.Vector3(0,0,0));
+
+			///////////////
+			// OTTAEDRO //
+			//////////////
+
+			// Geometry
+			const geometry = new THREE.Geometry();
+			geometry.vertices.push(
+				new THREE.Vector3( 0,  3,  0),  // 0  Punto in alto
+				new THREE.Vector3( 0, -3,  0),  // 1  Punto in basso
+				new THREE.Vector3( 0,  0,  3),  // 2
+				new THREE.Vector3( 3,  0,  0),  // 3
+				new THREE.Vector3(-3,  0,  0),  // 4
+				new THREE.Vector3( 0,  0, -3),  // 5
+			);
+
+            geometry.faces.push(
+				// 4 superiori
+				new THREE.Face3(0, 2, 3),
+				new THREE.Face3(0, 2, 4),
+                new THREE.Face3(0, 3, 5),
+                new THREE.Face3(0, 4, 5),
+                // 4 inferiori
+				new THREE.Face3(1, 2, 3),
+				new THREE.Face3(1, 2, 4),
+                new THREE.Face3(1, 3, 5),
+                new THREE.Face3(1, 4, 5),
+			);
+
+            // Uso la tecnica wireframe
+            var wireframe = new THREE.WireframeGeometry( geometry );
+			var mat = new THREE.LineBasicMaterial( { color: "black" } );
+
+			ottaedro = new THREE.LineSegments( wireframe, mat );
+            scene.add( ottaedro );
+
+			/////////////////////////////////////////////
+            // GESTIONE COORDINATE E MOVIMENTO CAMERA //
+            ///////////////////////////////////////////
+			Coordinates.drawAllAxes();
+
+			controls = new THREE.OrbitControls( camera );
+
+			////////////////////////////////
+            // GESTIONE MONITORAGGIO FPS //
+            //////////////////////////////
+			stats = new Stats();
+			stats.domElement.style.position = 'absolute';
+			stats.domElement.style.top = '1vw';
+            stats.domElement.style.left = '1vw';
+			document.body.appendChild( stats.domElement );
+		}
+
+		function Update() {
+			requestAnimationFrame( Update );
+			controls.update();
+			stats.update();
+			Render();
+		}
+
+		function Render() {
+			renderer.render(scene, camera);
+		}
+
+		Start();
+		Update();
+
+		</script>
+	</body>
+</html>

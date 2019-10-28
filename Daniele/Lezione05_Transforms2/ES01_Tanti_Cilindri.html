@@ -1,0 +1,188 @@
+<html>
+	<head>
+		<title>Cilindri - Working with Matrices</title>
+		<style>
+
+		body {
+			font-family: Monospace;
+			margin: 0px;
+			overflow: hidden;
+		}
+
+		canvas {
+			width: 100%;
+			height: 100%;
+		}
+
+	</style>
+		<script src="../lib/three.js"></script>
+		<script src="../lib/stats.min.js"></script>
+		<script src="../lib/Coordinates.js"></script>
+		<script src="../lib/OrbitControls.js"></script>
+	</head>
+	<body>
+
+		<script>
+
+		var scene, camera, renderer, controls, stats;
+
+		function Start() {
+
+			//////////////////////////
+            // OPERAZIONI INIZIALI //
+            ////////////////////////
+
+            // Creo una scena e ne setto il colore di background (sovrascrive il CSS)
+			scene = new THREE.Scene();
+			scene.background = new THREE.Color( '#b1e0e2' );
+
+			// Creo una camera
+			camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
+
+			// Creo un renderer
+			renderer = new THREE.WebGLRenderer();
+			renderer.setSize( window.innerWidth, window.innerHeight );
+			renderer.setClearColor( 0xf0f0f0 );
+			document.body.appendChild( renderer.domElement );
+
+			// Setto la posizione della camera e le dico dove guardare (origine)
+			camera.position.set(3,4,6);
+			camera.lookAt( new THREE.Vector3(0,0,0));
+
+			/////////////////////////////
+			// INSERIRE QUI IL CODICE //
+			///////////////////////////
+
+			// Default: cubo opaco
+
+			var geometry = new THREE.BoxGeometry(2,2,2);
+			var material = new THREE.MeshBasicMaterial( { color: 0xaaaaaa, transparent: true, opacity:0.4 } );
+			var cube = new THREE.Mesh( geometry, material );
+
+			scene.add( cube );
+
+			// Cilindro
+
+			var cylinder_geometry = new THREE.CylinderGeometry(0.5,0.5,5);
+			var cylinder_material = new THREE.MeshBasicMaterial( { color: 0xaaaaff });
+
+			var cylinder = new THREE.Mesh(cylinder_geometry, cylinder_material);
+
+			var maxCorner = new THREE.Vector3(-1,1,1);
+			var minCorner = new THREE.Vector3(1,-1,-1);
+			var rotatedCyl_axis = new THREE.Vector3();
+			rotatedCyl_axis.subVectors(maxCorner, minCorner);
+			rotatedCyl_axis.normalize();
+			var angle = Math.acos( rotatedCyl_axis.dot( new THREE.Vector3(0,1,0)) );
+
+			// dato un vettore di partenza e la sua versione ruotata
+			// abbiamo trovato il modo di ottenere il suo angolo di rotazione (acos)
+
+			var rotationAxis = new THREE.Vector3();
+			rotationAxis.crossVectors(new THREE.Vector3(0,1,0), rotatedCyl_axis);
+			rotationAxis.normalize();
+
+			console.log(rotationAxis);
+
+			cylinder.matrix.makeRotationAxis( rotationAxis, angle);
+			cylinder.matrixAutoUpdate = false;
+			scene.add( cylinder );
+
+			// Aggiungo il secondo cilindro
+
+			var cylinder2 = new THREE.Mesh(cylinder_geometry, cylinder_material);
+
+			var maxCorner2 = new THREE.Vector3(1,1,1);
+			var minCorner2 = new THREE.Vector3(-1,-1,-1);
+			var rotatedCyl_axis2 = new THREE.Vector3();
+			rotatedCyl_axis2.subVectors(maxCorner2, minCorner2);
+			rotatedCyl_axis2.normalize();
+			var angle2 = Math.acos( rotatedCyl_axis2.dot( new THREE.Vector3(0,1,0)) );
+
+			var rotationAxis2 = new THREE.Vector3();
+			rotationAxis2.crossVectors(new THREE.Vector3(0,1,0), rotatedCyl_axis2);
+			rotationAxis2.normalize();
+
+			console.log(rotationAxis2);
+
+			cylinder2.matrix.makeRotationAxis( rotationAxis2, angle2);
+			cylinder2.matrixAutoUpdate = false;
+			scene.add( cylinder2 );
+
+			// Aggiungo il terzo cilindro
+
+			var cylinder3 = new THREE.Mesh(cylinder_geometry, cylinder_material);
+
+			var maxCorner3 = new THREE.Vector3(0,1,-1);
+			var minCorner3 = new THREE.Vector3(0,-1,1);
+			var rotatedCyl_axis3 = new THREE.Vector3();
+			rotatedCyl_axis3.subVectors(maxCorner3, minCorner3);
+			rotatedCyl_axis3.normalize();
+			var angle3 = Math.acos( rotatedCyl_axis3.dot( new THREE.Vector3(0,1,0)) );
+
+			var rotationAxis3 = new THREE.Vector3();
+			rotationAxis3.crossVectors(new THREE.Vector3(0,1,0), rotatedCyl_axis3);
+			rotationAxis3.normalize();
+
+			console.log(rotationAxis3);
+
+			cylinder3.matrix.makeRotationAxis( rotationAxis3, angle3);
+			cylinder3.matrixAutoUpdate = false;
+			scene.add( cylinder3 );
+
+			// Aggiungo il quarto cilindro
+
+			var cylinder4 = new THREE.Mesh(cylinder_geometry, cylinder_material);
+
+			var maxCorner4 = new THREE.Vector3(1,0,0);
+			var minCorner4 = new THREE.Vector3(-1,0,0);
+			var rotatedCyl_axis4 = new THREE.Vector3();
+			rotatedCyl_axis4.subVectors(maxCorner4, minCorner4);
+			rotatedCyl_axis4.normalize();
+			var angle4 = Math.acos( rotatedCyl_axis4.dot( new THREE.Vector3(0,1,0)) );
+
+			var rotationAxis4 = new THREE.Vector3();
+			rotationAxis4.crossVectors(new THREE.Vector3(0,1,0), rotatedCyl_axis4);
+			rotationAxis4.normalize();
+
+			console.log(rotationAxis4);
+
+			cylinder4.matrix.makeRotationAxis( rotationAxis4, angle4);
+			cylinder4.matrixAutoUpdate = false;
+			scene.add( cylinder4 );
+			
+
+			/////////////////////////////////////////////
+            // GESTIONE COORDINATE E MOVIMENTO CAMERA //
+            ///////////////////////////////////////////
+			Coordinates.drawAllAxes();
+
+			controls = new THREE.OrbitControls( camera );
+
+			////////////////////////////////
+            // GESTIONE MONITORAGGIO FPS //
+            //////////////////////////////
+			stats = new Stats();
+			stats.domElement.style.position = 'absolute';
+			stats.domElement.style.top = '1vw';
+            stats.domElement.style.left = '1vw';
+			document.body.appendChild( stats.domElement );
+		}
+
+		function Update() {
+			requestAnimationFrame( Update );
+			controls.update();
+			stats.update();
+			Render();
+		}
+
+		function Render() {
+			renderer.render(scene, camera);
+		}
+
+		Start();
+		Update();
+
+		</script>
+	</body>
+</html>
