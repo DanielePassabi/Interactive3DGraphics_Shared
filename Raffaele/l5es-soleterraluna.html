@@ -25,12 +25,12 @@
 
 		<script>
 
-		var scene, camera, renderer, controls, stats, earth, sun, moon, clock, earthPivot, moonPivot;
+		var scene, camera, renderer, controls, stats, earth, sun, moon, start, clock, earthPivot, moonPivot;
 
 		function Start() {
 			scene = new THREE.Scene();
 			camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
-			clock = Date.now();
+			start = Date.now();
 			renderer = new THREE.WebGLRenderer();
 			renderer.setSize( window.innerWidth, window.innerHeight );
 			renderer.setClearColor( 0xf0f0f0 );
@@ -84,10 +84,10 @@
 		}
 
 		function Update() {
-			earthPivot.rotation.y += 0.02;
-			moonPivot.rotation.y += 0.2;
-			earth.rotation.y += 0.02;
-			clock = Date.now() + 1000;
+			clock = Date.now() - start;
+			earthPivot.rotation.y = Math.PI/180 * clock/1000;
+			moonPivot.rotation.y =  Math.PI/180 * clock/1000 * 360;
+			earth.rotation.y =  Math.PI/180 * clock/1000 * 360;;
 			requestAnimationFrame(Update);
 			controls.update();
 			stats.update();
