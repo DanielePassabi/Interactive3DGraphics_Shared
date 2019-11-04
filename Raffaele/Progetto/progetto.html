@@ -1,0 +1,428 @@
+<html>
+	<head>
+		<title>Starting Code for 1st Project 2017</title>
+		<style>
+		
+		body {
+			font-family: Monospace;
+			background-color: #f0f0f0;
+			margin: 0px;
+			overflow: hidden;
+		}
+		
+		canvas { 
+			width: 100%; 
+			height: 100%;
+		}
+	
+	</style>
+		<script src="lib/three.min.js"></script>
+		<script src="lib/stats.min.js"></script>
+		<script src="lib/Coordinates.js"></script>
+		<script src="lib/OrbitControls.js"></script>
+	</head>
+	<body>
+		
+		<script>
+		
+        var scene, camera, renderer, controls, stats, treno, vagone, vagone1, vagone2, testa, set4Ruote, set4Ruote1, set4Ruote2,
+        setRuoteTestaDietro, setRuoteDietro, setRuoteDavanti, setRuoteTestaDavanti, setRuoteCabina, setRuoteDietro1, setRuoteDavanti1,
+        setRuoteDietro2, setRuoteDavanti2, tempoInizio, vagone, locomotiva, vagone1, vagone2, tempoRotatazioneTesta,
+        tempoRotatazioneVagone, tempoRotatazioneVagone1, tempoRotatazioneVagone2, tempoRotatazioneTreno;
+		
+		//return array with height data from img, taken from: http://danni-three.blogspot.it/2013/09/threejs-heightmaps.html
+		function getHeightData(img,scale) {
+  
+		 if (scale == undefined) scale=1;
+  
+		    var canvas = document.createElement( 'canvas' );
+		    canvas.width = img.width;
+		    canvas.height = img.height;
+		    var context = canvas.getContext( '2d' );
+ 
+		    var size = img.width * img.height;
+			console.log(size);
+		    var data = new Float32Array( size );
+ 
+		    context.drawImage(img,0,0);
+ 
+		    for ( var i = 0; i < size; i ++ ) {
+		        data[i] = 0
+		    }
+ 
+		    var imgd = context.getImageData(0, 0, img.width, img.height);
+		    var pix = imgd.data;
+ 
+		    var j=0;
+		    for (var i = 0; i<pix.length; i +=4) {
+		        var all = pix[i]+pix[i+1]+pix[i+2];  // all is in range 0 - 255*3
+		        data[j++] = scale*all/3;   
+		    }
+     
+		    return data;
+        }
+        
+        function Field(img, data){
+            var cube_geometry = new THREE.CubeGeometry(1, 1, 1); // raggio altezza
+			var cube_material = new THREE.MeshBasicMaterial( { color: 0xffffff } );
+            var width = img.width;
+            var height = img.height;
+			for(i = 0 ; i < data.length; i++){
+				var cube = new THREE.Mesh( cube_geometry, cube_material ) ;
+				cube.position.set(i % width, data[i], i/width);
+				scene.add(cube);
+			}
+        }
+		function Start() {
+            tempoInizio = Date.now();
+			scene = new THREE.Scene();
+			camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
+
+			renderer = new THREE.WebGLRenderer( {antialias: true} );
+			renderer.setSize( window.innerWidth, window.innerHeight );
+			renderer.setClearColor( 0xf0f0f0 );
+			document.body.appendChild( renderer.domElement );
+			
+			camera.position.set(100,200,50);
+            camera.up.set(0, 0, -1);
+            camera.lookAt(new THREE.Vector3(50,0,0));
+			
+            var geometry = new THREE.BoxGeometry(1,1,1);
+            
+            var sqrt2 = Math.sqrt(2);
+            //treno
+            //uso un pivot per parte del treno e le ruoto una volta che raggiungono un certo punto.
+
+            treno = new THREE.Object3D();
+
+            
+            //treno.position.y = 1;
+            //vagoni 0,1,2
+            vagone = new THREE.Object3D();
+            vagone.position.z = 100;
+
+            vagone1 = new THREE.Object3D();
+            vagone1.position.z = 100;
+
+            vagone2 = new THREE.Object3D();
+            vagone2.position.z = 100;
+
+            var materialeContenitore = new THREE.MeshBasicMaterial( { color: 0xa00000 } );
+			var contenitore = new THREE.Mesh( geometry, materialeContenitore );
+            contenitore.scale.set(4,2,2);
+            vagone.add(contenitore);
+            
+            var materialeContenitore1 = new THREE.MeshBasicMaterial( { color: 0x404000 } );
+            var contenitore1 = contenitore.clone();
+            contenitore1.material = materialeContenitore1;
+            vagone1.add(contenitore1);
+
+            var materialeContenitore2 = new THREE.MeshBasicMaterial( { color: 0x004040 } );
+            var contenitore2 = contenitore.clone();
+            contenitore2.material = materialeContenitore2;
+            vagone2.add(contenitore2);
+            //testa
+            locomotiva = new THREE.Object3D();
+            var materialeLocomotiva = new THREE.MeshBasicMaterial( { color: 0x000000 } );
+            locomotiva.position.z = 100;
+
+            var materialeCabina = new THREE.MeshBasicMaterial( { color: 0x333333 } );
+			var cabina = new THREE.Mesh( geometry, materialeCabina );
+            cabina.scale.set(2,4,2);
+            cabina.position.x = -2;
+            cabina.position.y = 1;
+            locomotiva.add(cabina);
+
+            var motrice = new THREE.Mesh( geometry, materialeLocomotiva );
+            motrice.scale.set(4,2,2);
+            motrice.rotation.x = 45 * Math.PI/180;
+            motrice.position.y = Math.sqrt(2) - 1;
+            motrice.position.x = 1;
+            locomotiva.add(motrice);
+
+            var baseCamino = new THREE.Mesh( geometry, materialeLocomotiva);
+            baseCamino.scale.set(1,2,1);
+            baseCamino.rotation.y = 45 * Math.PI/180;
+            baseCamino.position.y = 2;
+            baseCamino.position.x = 1.5;
+            locomotiva.add(baseCamino);
+
+            var testaCamino = new THREE.Mesh( geometry, materialeLocomotiva);
+            testaCamino.scale.set(1.5,0.25,1.5);
+            testaCamino.rotation.y = 45 * Math.PI/180;
+            testaCamino.position.y = 3;
+            testaCamino.position.x = 1.5;
+            locomotiva.add(testaCamino);
+
+            //ruote
+            setDiRuote = new THREE.Object3D();
+            setDiRuote.position.y = -1;
+            
+
+            var ruotadx = new THREE.Object3D();
+            setDiRuote.add(ruotadx);
+            ruotadx.position.z = sqrt2;
+
+            var materialeGomma = new THREE.MeshBasicMaterial({color: 0x222222});
+            var gomma = new THREE.Mesh( geometry, materialeGomma);
+            gomma.scale.set(0.5,0.5,0.1);
+            gomma.rotation.z = 45 * Math.PI/180;
+            ruotadx.add(gomma);
+
+            var materialeCerchione = new THREE.MeshBasicMaterial({color: 0xaaaaaa});
+            var cerchione = new THREE.Mesh( geometry, materialeCerchione);
+            cerchione.scale.set(0.4,0.4,0.15);
+            cerchione.rotation.z = 45 * Math.PI/180;
+            ruotadx.add(cerchione);
+
+            var asse = new THREE.Mesh( geometry, materialeCerchione);
+            asse.scale.set(0.05,0.05,2 * sqrt2);
+            asse.rotation.z = 45 * Math.PI/180;
+            setDiRuote.add(asse);
+
+            var ruotasx = new THREE.Object3D();
+            ruotasx = ruotadx.clone();
+            setDiRuote.add(ruotasx);
+            ruotasx.position.z = -sqrt2;
+            //ruote motrice
+            setRuoteTestaDietro = setDiRuote.clone();
+            //setRuoteTestaDietro.scale.set(1,1,1/2);
+            locomotiva.add(setRuoteTestaDietro);
+
+            setRuoteTestaDavanti = setRuoteTestaDietro.clone();
+            setRuoteTestaDavanti.position.x = 2;
+            locomotiva.add(setRuoteTestaDavanti);
+            //ruote cabina
+            setRuoteCabina = setDiRuote.clone();
+            //setRuoteCabina.scale.set(1.2,1.2,1.2);
+            setRuoteCabina.position.x = -2;
+            locomotiva.add(setRuoteCabina);
+            //ruote vagone 0,1,2
+            var set4Ruote = new THREE.Object3D();
+
+            setRuoteDavanti = setDiRuote.clone();
+            setRuoteDavanti.position.x = 1.5;
+            set4Ruote.add(setRuoteDavanti);
+
+            setRuoteDietro  = setDiRuote.clone();
+            setRuoteDietro.position.x = - 1.5;
+            set4Ruote.add(setRuoteDietro);
+            vagone.add(set4Ruote);
+
+            var set4Ruote1 = new THREE.Object3D();
+
+            setRuoteDavanti1 = setDiRuote.clone();
+            setRuoteDavanti1.position.x = 1.5;
+            set4Ruote1.add(setRuoteDavanti1);
+
+            setRuoteDietro1  = setDiRuote.clone();
+            setRuoteDietro1.position.x = - 1.5;
+            set4Ruote1.add(setRuoteDietro1);
+            vagone1.add(set4Ruote1);
+
+            var set4Ruote2 = new THREE.Object3D();
+
+            setRuoteDavanti2 = setDiRuote.clone();
+            setRuoteDavanti2.position.x = 1.5;
+            set4Ruote2.add(setRuoteDavanti2);
+
+            setRuoteDietro2  = setDiRuote.clone();
+            setRuoteDietro2.position.x = - 1.5;
+            set4Ruote2.add(setRuoteDietro2);
+            vagone2.add(set4Ruote2);
+
+
+            //ganci 0, 1, 2 si trovano nella parte frontale di ogni vagone
+            var materialeGanci = new THREE.MeshBasicMaterial( { color: 0xaaaaaa } );
+            var gancio = new THREE.Object3D();
+            gancio.position.x = 2.5;
+			var perno = new THREE.Mesh( geometry, materialeGanci);
+            perno.scale.set(0.5,0.25,0.5);
+            gancio.add(perno);
+            var ganciosx = new THREE.Mesh( geometry, materialeGanci);
+            ganciosx.scale.set(1,0.25,0.25);
+            ganciosx.position.z = -0.25;
+            gancio.add(ganciosx);
+            var ganciodx = new THREE.Mesh( geometry, materialeGanci);
+            ganciodx.scale.set(1,0.25,0.25);
+            ganciodx.position.z = 0.25;
+            gancio.add(ganciodx);
+            vagone.add(gancio);
+
+            var gancio1 = new THREE.Object3D();
+            gancio1 = gancio.clone();
+            gancio1.position.x = 2.5;
+            vagone1.add(gancio1);
+
+            var gancio2 = new THREE.Object3D();
+            gancio2 = gancio.clone();
+            gancio2.position.x = 2.5;
+            vagone2.add(gancio2);
+            
+            locomotiva.position.x = 7.5;
+
+            vagone.position.x = 1.5;
+
+            vagone1.position.x = -3.5;
+
+            vagone2.position.x = -8.5;
+
+            treno.add(locomotiva);
+            treno.add(vagone);
+            treno.add(vagone1);
+            treno.add(vagone2);
+            scene.add( treno );
+            
+
+            //binari
+
+
+			
+			stats = new Stats();
+			stats.domElement.style.position = 'absolute';
+			stats.domElement.style.top = '0px';
+			document.body.appendChild( stats.domElement );
+			
+			// uncomment if you need to draw coordinate axes when building the scene
+			Coordinates.drawAllAxes();
+			
+			controls = new THREE.OrbitControls( camera );
+			controls.addEventListener( 'change', Render );
+			
+			// terrain
+			var img = new Image();
+			img.onload = function () {
+				
+                //get height data from img
+                var data = getHeightData(img,0.1);
+                // load img source
+                img.src = "textures/heightmap2.png";
+                Field(img, data);
+                
+            }
+			
+			
+		}
+		
+		function Update() {
+            var clock = Date.now() - tempoInizio;
+            var partePercorso = (clock / 1000) % 40;
+            setRuoteDavanti.rotation.z = Math.PI/180 * clock/1000 * 360;
+            setRuoteDietro.rotation.z = Math.PI/180 * clock/1000 * 360;
+            setRuoteDavanti1.rotation.z = Math.PI/180 * clock/1000 * 360;
+            setRuoteDietro1.rotation.z = Math.PI/180 * clock/1000 * 360;
+            setRuoteDavanti2.rotation.z = Math.PI/180 * clock/1000 * 360;
+            setRuoteDietro2.rotation.z = Math.PI/180 * clock/1000 * 360;
+            setRuoteTestaDavanti.rotation.z = Math.PI/180 * clock/1000 * 360;
+            setRuoteTestaDietro.rotation.z = Math.PI/180 * clock/1000 * 360;
+            setRuoteCabina.rotation.z = Math.PI/180 * clock/1000 * 360;
+            
+            if(partePercorso <10 && partePercorso >= 0){
+                treno.position.x = partePercorso * 20;
+                if(partePercorso>=9.5){
+                    locomotiva.rotation.y = (partePercorso - 9.5) * Math.PI/180*10;
+                }else{                   
+                    locomotiva.rotation.y = 0;
+                }
+                if(partePercorso>=9.75){
+                    vagone.rotation.y = (partePercorso - 9.75) * Math.PI/180*10;
+                }else{
+                    vagone.rotation.y = 0;
+                }
+                if(partePercorso<=0.25){
+                    vagone1.rotation.y = (0.25 - partePercorso) * Math.PI/180*10;
+                }else{
+                    vagone1.rotation.y = 0;
+                }
+                if(partePercorso<=0.5){
+                    vagone2.rotation.y = (0.5 - partePercorso) * Math.PI/180*10;
+                }else{
+                    vagone2.rotation.y = 0;
+                }
+            }
+            if(partePercorso <20 && partePercorso >= 10){
+                treno.rotation.y = (partePercorso - 10) * Math.PI/180 * 18;
+                if(partePercorso>=19.5){
+                    locomotiva.rotation.y = (20 - partePercorso) * Math.PI/180 *10;
+                }else{
+                    locomotiva.rotation.y = 5* Math.PI/180;
+                }
+                if(partePercorso>=19.75){
+                    vagone.rotation.y = (20 - partePercorso) * Math.PI/180 *10;
+                }else{
+                    vagone.rotation.y =  2.5*Math.PI/180;
+                }
+                if(partePercorso<=10.25){
+                    vagone1.rotation.y = (partePercorso-10) * Math.PI/180 *10;
+                }else{
+                    vagone1.rotation.y = 2.5 * Math.PI/180;
+                }
+                if(partePercorso<=10.5){
+                    vagone2.rotation.y = (partePercorso-10) * Math.PI/180 *10;
+                }else{
+                    vagone2.rotation.y = 5 * Math.PI/180;
+                }
+            }
+            if(partePercorso <30 && partePercorso >= 20){
+                treno.position.x = 200 -(partePercorso - 20)*20;
+                if(partePercorso>=29.5){
+                    locomotiva.rotation.y = (partePercorso - 29.5) * Math.PI/180*10;
+                }else{
+                    locomotiva.rotation.y = 0;
+                }
+                if(partePercorso>=29.75){
+                    vagone.rotation.y = (partePercorso - 29.75) * Math.PI/180*10;
+                }else{
+                    vagone.rotation.y = 0;
+                }
+                if(partePercorso<=20.5){
+                    vagone1.rotation.y = (20.5 - partePercorso) * Math.PI/180*10;
+                }else{
+                    vagone1.rotation.y = 0;
+                }
+                if(partePercorso<=20.25){
+                    vagone2.rotation.y = (20.25 - partePercorso) * Math.PI/180*10;
+                }else{
+                    vagone2.rotation.y = 0;
+                }
+            }
+            if(partePercorso <40 && partePercorso >= 30){
+                treno.rotation.y = Math.PI + (partePercorso - 30) * Math.PI/180 * 18;
+                if(partePercorso>=39.5){
+                    locomotiva.rotation.y = (40 - partePercorso) * Math.PI/180*10;
+                }else{
+                    locomotiva.rotation.y = 5 * Math.PI/180;
+                }
+                if(partePercorso>=39.75){
+                    vagone.rotation.y = (40 - partePercorso) * Math.PI/180*10;
+                }else{
+                    vagone.rotation.y = 2.5 * Math.PI/180;
+                }
+                if(partePercorso<=30.25){
+                    vagone1.rotation.y = (partePercorso-30) * Math.PI/180*10;
+                }else{
+                    vagone1.rotation.y = 2.5 * Math.PI/180;
+                }
+                if(partePercorso<=30.5){
+                    vagone2.rotation.y = (partePercorso-30) * Math.PI/180*10;
+                }else{
+                    vagone2.rotation.y = 5 * Math.PI/180;
+                }
+            }
+
+			requestAnimationFrame( Update );
+			controls.update();  
+			stats.update();
+			Render();
+		}
+		
+		function Render() {
+			renderer.render(scene, camera);
+        }
+        
+		Start();
+		Update();
+			
+		</script>
+	</body>
+</html>
