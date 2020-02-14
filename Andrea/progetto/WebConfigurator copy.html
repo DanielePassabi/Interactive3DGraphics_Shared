@@ -21,6 +21,8 @@
             <script src="libs/OrbitControls.js"></script>
 			<script src="libs/GLTFLoader.js"></script>
 			<script src='libs/dat.gui.min.js'></script>
+			<script src='libs/BufferGeometryUtils.js'></script>
+
 		</head>
 		-------------- Andrea Mansi UNIUD --- Progetto Interactive 3D Graphics --- Web Product Configurator ---
 			
@@ -479,16 +481,17 @@
 					   //modelMaterials[3] = new createMaterial(uniforms,basicVertex,basicFragment); 
 					   //modelMaterials[4] = new createMaterial(uniforms,basicVertex,basicFragmentTest); 
 
-					   var GlossyUuniforms = {
+					   var GlossyUniforms = {
 				    	cspec:	{ type: "v3", value: new THREE.Vector3(0.999,0.782,0.344) },
 				    	normalMap:	{ type: "t", value: normalMap},
-						normalScale: {type: "v2", value: new THREE.Vector2(0.3,0.3)},
+						normalScale: {type: "v2", value: new THREE.Vector2(0.0,0.0)},
 						envMap:	{ type: "t", value: cubemap},
-						roughness: { type: "f", value: 0.2},
+						roughness: { type: "f", value: 0.5},
 						};
 	
-						console.log(GlossyUuniforms);
-						glossyMaterial = createMaterial(GlossyUuniforms,glossyVertex,glossyFragment);
+						console.log(GlossyUniforms);
+
+						glossyMaterial = createMaterial(GlossyUniforms,glossyVertex,glossyFragment);
 
                        //modelParts[0].material = OpaqueBlackPlastic;
 					   modelParts[1].material = glossyMaterial;//GoldMetal; //OpaqueWhitePlastic;
@@ -503,6 +506,7 @@
 						
 
 						cb = new THREE.Mesh(cube,glossyMaterial);
+						//THREE.BufferGeometryUtils.computeTangents(cube);
 						scene.add(cb);
 					
 
